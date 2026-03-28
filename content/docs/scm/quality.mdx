@@ -1,0 +1,35 @@
+---
+title: "Quality"
+description: "Quality hold, assessment, and closure loops for SCM compliance operations."
+section: "Supply Chain (SCM)"
+---
+
+## Overview
+
+`scm.quality` handles deviation events, hold decisions, and resolution workflows.
+
+## Loop definition
+
+States: OPEN → HOLD → ASSESSMENT → RESOLVED → CLOSED (with BLOCKED as error state).
+
+Key guard IDs in canonical loop:
+
+- `quality_hold_released`
+- `lot_not_on_hold`
+
+## Actors
+
+Quality teams (`human`) collaborate with automation and AI-supported analysis for root-cause and closure steps.
+
+## Example
+
+```ts
+await loop.transition('start_assessment', {
+  actor: 'human:qa-lead',
+  evidence: { lot_not_on_hold: true, quality_hold_released: true }
+})
+```
+
+## Integration
+
+Quality loops often subscribe to Signal Tags verification exceptions and inventory hold events.

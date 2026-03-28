@@ -1,0 +1,41 @@
+---
+title: "Quick Start"
+description: "Stand up Commerce Chain with Loop Engine in minutes."
+section: "Getting Started"
+---
+
+## Install
+
+```bash
+npm install @loop-engine/sdk @commerce-chain/sdk
+```
+
+## Load canonical loops
+
+```ts
+import { createLoopEngine } from '@loop-engine/sdk'
+import { loopDefinitions } from '@commerce-chain/loops'
+
+const engine = createLoopEngine({ loops: loopDefinitions })
+```
+
+## Start a procurement flow
+
+```ts
+const loop = await engine.start({
+  loopId: 'scm.procurement',
+  aggregateId: 'PO-2026-0042',
+  context: { supplierId: 'SUP-22', amount: 24500 }
+})
+
+await loop.transition('confirm_po', {
+  actor: 'human:buyer',
+  evidence: { budget_available: true, supplier_approved: true }
+})
+```
+
+## Next
+
+- [Architecture](/docs/getting-started/architecture)
+- [Five Pillars](/docs/getting-started/five-pillars)
+- [SCM Overview](/docs/scm/overview)

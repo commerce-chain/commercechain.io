@@ -1,0 +1,30 @@
+---
+title: "Order Management"
+description: "Order confirmation, allocation, shipping, and closure loop definitions."
+section: "Demand Chain (DCM)"
+---
+
+## Loop definition
+
+Canonical order loop: `dcm.order`.
+
+States:
+
+- OPEN
+- CONFIRMED
+- ALLOCATION_PENDING
+- ALLOCATED
+- SHIPPED
+- ALLOCATION_FAILED
+- CANCELLED
+- CLOSED
+
+Key transitions: `confirm_order`, `request_allocation`, `allocation_succeeded`, `line_shipped`, `close_order`.
+
+## Guards
+
+`dcm.order.guard.close_loop` ensures closure policy is satisfied.
+
+## Integration
+
+Order loops depend on SCM inventory and execution events for allocation and shipping confirmation.

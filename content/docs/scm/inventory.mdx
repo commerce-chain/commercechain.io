@@ -1,0 +1,36 @@
+---
+title: "Inventory"
+description: "Inventory reconciliation loop with reservation and adjustment controls."
+section: "Supply Chain (SCM)"
+---
+
+## Overview
+
+`scm.inventory` provides a lightweight but auditable inventory balancing loop.
+
+## Loop definition
+
+States: OPEN → ADJUSTED → RECONCILED → CLOSED.
+
+Transition IDs: `inventory_adjusted`, `inventory_reconciled`, `close_inventory`.
+
+## Actors
+
+`human`, `automation`, and `system` support reconciliation workflows.
+
+## Example
+
+```ts
+await loop.transition('inventory_adjusted', {
+  actor: 'human:inventory-controller',
+  evidence: { adjustment_reason: 'cycle_count' }
+})
+```
+
+## Adapter integration
+
+Use adapter interfaces for stock reservation, lot-level updates, and warehouse posting.
+
+## Industry extensions
+
+Pharma and Construction packs add lot/expiry/certification evidence fields and stricter adjustment controls.

@@ -1,0 +1,77 @@
+---
+title: "Procurement"
+description: "SCM procurement loop with governed PO confirmation, receipt, and invoice matching."
+section: "Supply Chain (SCM)"
+---
+
+## Overview
+
+The canonical procurement loop (`scm.procurement`) governs PO confirmation through settlement.
+
+## Loop definition
+
+States from canonical definitions:
+
+- OPEN
+- PO_CONFIRMED
+- RECEIPT_SCHEDULED
+- GOODS_RECEIVED
+- INVOICE_MATCHED
+- DISPUTED
+- CLOSED
+
+Key transitions include `confirm_po`, `schedule_receipt`, `receive_goods`, and `close_procurement`.
+
+## Key actors
+
+- `automation`: event ingestion and orchestration.
+- `ai-agent`: recommendation support where policy allows.
+- `human`: approval and exception handling.
+- `system`: deterministic integration actions.
+
+## Guards
+
+From canonical definitions:
+
+- `budget_available`
+- `supplier_approved`
+- `quantity_within_threshold`
+- `three_way_match`
+
+Runtime support also includes `human-only`, `confidence-threshold`, and `evidence-required`.
+
+## YAML excerpt
+
+```yaml
+id: scm.procurement
+transitions:
+  - id: confirm_po
+    from: OPEN
+    to: PO_CONFIRMED
+    guards:
+      - id: approval_obtained
+      - id: actor_has_permission
+  - id: receive_goods
+    from: RECEIPT_SCHEDULED
+    to: RECEIVED
+```
+
+## TypeScript example
+
+```ts
+import { createLoopEngine } from '@loop-engine/sdk'
+
+const loop = await engine.start({ loopId: 'scm.procurement', aggregateId: 'PO-42' })
+await loop.transition('confirm_po', {
+  actor: 'human:buyer',
+  evidence: { budget_available: true, supplier_approved: true }
+})
+```
+
+## ERP adapter integration
+
+Implement adapter hooks in `@commerce-chain/adapters` for PO creation, supplier confirmation, receipt posting, and invoice matching.
+
+## Industry Pack extensions
+
+Pharma and Healthcare packs add stricter hold and compliance evidence requirements during receipt and dispute handling.

@@ -1,0 +1,42 @@
+---
+title: "Architecture"
+description: "Commerce Chain architecture — Five Pillars, OSS/hosted boundary, and ecosystem integrations."
+section: "Getting Started"
+---
+
+## The CCO model
+
+Commerce Chain treats supply chain and demand chain as one operational system.
+SCM and DCM loops share state through Loop Engine events instead of separate orchestration stacks.
+
+## OSS surface vs hosted platform
+
+<OSSSurface>
+Domain types, loop definitions, guard contracts, and adapter interfaces are open and portable.
+</OSSSurface>
+
+<ProprietaryNote>
+AI intelligence services, tenant isolation, hosted execution, billing, and enterprise compliance reporting are part of Better Data CCO.
+</ProprietaryNote>
+
+Apache-2.0 is used for explicit patent grant support and enterprise legal adoption.
+
+## Technology stack
+
+- Loop Engine runtime executes all SCM/DCM loops.
+- Commerce Gateway provides LLM-ready commerce data access.
+- Signal Tags emits product-authentication signals for compliance loops.
+- `@commerce-chain/*` packages provide framework contracts.
+
+## End-to-end procurement flow
+
+1. Signal Tags verification event marks a suspect lot (`SENSE`).
+2. AI actor retrieves supplier context through Commerce Gateway (`DECIDE`).
+3. Guard policy evaluates confidence and permission constraints (`GOVERN`).
+4. Human buyer approves procurement action (`EXECUTE`).
+5. Loop completion emits learning signals and outcome deltas (`IMPROVE`).
+
+## Deployment options
+
+- Self-hosted: run Loop Engine + Commerce Chain contracts in your infra.
+- Hosted: Better Data operates multi-tenant CCO with managed integrations.

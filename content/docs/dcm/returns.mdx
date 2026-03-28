@@ -1,0 +1,33 @@
+---
+title: "Returns"
+description: "RMA approval, receipt handling, restock, credit, and close loops."
+section: "Demand Chain (DCM)"
+---
+
+## Loop definition
+
+Canonical returns loop: `dcm.returns`.
+
+States include:
+
+- OPEN
+- RMA_APPROVED / RMA_REJECTED
+- RECEIPT_PENDING / RECEIVED
+- DAMAGED_HOLD / RESTOCKED
+- CREDITED / CLOSED
+
+## Guard policies
+
+- `dcm.returns.guard.is_damaged_condition`
+- `dcm.returns.guard.is_finalized`
+
+## Example
+
+```ts
+await loop.transition('credit_return', {
+  actor: 'automation:returns-service',
+  evidence: { restock_rate: 0.74 }
+})
+```
+
+Returns outcomes feed back into demand and quality planning.

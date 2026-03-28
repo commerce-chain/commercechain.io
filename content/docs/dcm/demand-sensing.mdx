@@ -1,0 +1,30 @@
+---
+title: "Demand Sensing"
+description: "Signal ingestion and evaluation loops for demand-side detection."
+section: "Demand Chain (DCM)"
+---
+
+## Loop definition
+
+Canonical loop: `dcm.demand-signal`.
+
+States: OPEN → SIGNAL_RECEIVED → EVALUATED → TRIGGERED → CLOSED.
+
+Transition events:
+
+- `dcm.demand.signal_received.v1`
+- `dcm.demand.signal_evaluated.v1`
+- `dcm.demand.replenishment_triggered.v1`
+
+## Spawn integration
+
+Demand sensing can spawn `scm.replenishment` loops when thresholds are crossed.
+
+## Example
+
+```ts
+await loop.transition('signal_evaluated', {
+  actor: 'ai-agent:forecasting',
+  evidence: { signal_precision: 0.87 }
+})
+```

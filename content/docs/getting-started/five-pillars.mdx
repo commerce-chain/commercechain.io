@@ -1,0 +1,61 @@
+---
+title: "Five Pillars"
+description: "SENSE, DECIDE, EXECUTE, GOVERN, IMPROVE — the operating model for Commerce Chain."
+section: "Getting Started"
+---
+
+<div id="sense"></div>
+## SENSE
+
+<PillarBadge>SENSE</PillarBadge>
+
+Detect demand and supply events with typed contracts. OSS primitives include `LoopDefinition`, domain event IDs, and demand-signal loops (`dcm.demand-signal`).
+
+```yaml
+id: dcm.demand-signal
+states: [OPEN, SIGNAL_RECEIVED, EVALUATED, TRIGGERED, CLOSED]
+```
+
+<div id="decide"></div>
+## DECIDE
+
+<PillarBadge>DECIDE</PillarBadge>
+
+Decision loops model recommendation boundaries and actor roles (`human`, `automation`, `ai-agent`, `system`).
+Use loop transition evidence to keep recommendation rationale inspectable.
+
+<div id="execute"></div>
+## EXECUTE
+
+<PillarBadge>EXECUTE</PillarBadge>
+
+Execution loops in SCM/DCM drive concrete actions (reserve stock, ship line, credit return).
+Adapter contracts in `@commerce-chain/adapters` map those transitions to ERP/WMS/TMS actions.
+
+```yaml
+id: close_fulfillment
+from: SHIPPED
+to: CLOSED
+triggeredBy: dcm.orders.order_line_shipped.v1
+```
+
+<div id="govern"></div>
+## GOVERN
+
+<PillarBadge>GOVERN</PillarBadge>
+
+Runtime and module guards enforce policy. Built-in runtime guard exports include `confidence-threshold`, `human-only`, and `evidence-required`.
+
+```yaml
+guards:
+  - id: approval_obtained
+  - id: actor_has_permission
+```
+
+<div id="improve"></div>
+## IMPROVE
+
+<PillarBadge>IMPROVE</PillarBadge>
+
+Closed loops emit learning signals with `predicted`, `actual`, and `delta` fields.
+`LearningSignal` includes `loopId`, `aggregateId`, `outcomeId`, and metric identifiers for feedback analytics.

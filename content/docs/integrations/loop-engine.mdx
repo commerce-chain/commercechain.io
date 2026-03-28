@@ -1,0 +1,33 @@
+---
+title: "Loop Engine"
+description: "Commerce Chain uses Loop Engine as its governed runtime layer."
+section: "Integrations"
+---
+
+Commerce Chain provides domain contracts and canonical loops.
+Loop Engine executes those loops with actor attribution, guards, and event trails.
+
+## Install
+
+```bash
+npm install @loop-engine/sdk @commerce-chain/sdk
+```
+
+## Example
+
+```ts
+import { createLoopEngine } from '@loop-engine/sdk'
+import { procurement } from '@commerce-chain/loops/scm'
+
+const engine = createLoopEngine({ loops: [procurement] })
+```
+
+## Guard mapping
+
+Commerce Chain loop policies map to Loop Engine guard semantics:
+
+- `confidence-threshold`
+- `human-only`
+- `evidence-required`
+
+<EcosystemLink href="https://loopengine.io">loopengine.io</EcosystemLink>

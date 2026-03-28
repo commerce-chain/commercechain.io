@@ -1,0 +1,23 @@
+---
+title: "Overview"
+description: "Supply Chain module overview: procurement, fulfillment, inventory, and quality loops."
+section: "Supply Chain (SCM)"
+---
+
+SCM in Commerce Chain uses four canonical loops:
+
+- `scm.procurement`
+- `scm.fulfillment`
+- `scm.inventory`
+- `scm.quality`
+
+Each loop is a typed `LoopDefinition` with explicit states, transitions, and actor permissions.
+
+## At a glance
+
+| Loop | Core states |
+| --- | --- |
+| procurement | OPEN → PO_CONFIRMED → RECEIPT_SCHEDULED → GOODS_RECEIVED → INVOICE_MATCHED → CLOSED |
+| fulfillment | OPEN → RESERVED → PICKED → PACKED → SHIPPED → CLOSED |
+| inventory | OPEN → ADJUSTED → RECONCILED → CLOSED |
+| quality | OPEN → HOLD → ASSESSMENT → RESOLVED → CLOSED |

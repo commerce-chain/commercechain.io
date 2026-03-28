@@ -1,0 +1,42 @@
+---
+title: "Fulfillment"
+description: "SCM fulfillment loop from stock reservation to shipment closure."
+section: "Supply Chain (SCM)"
+---
+
+## Overview
+
+`scm.fulfillment` coordinates reservation, warehouse execution, and shipment closeout.
+
+## Loop definition
+
+States:
+
+- OPEN
+- RESERVED
+- PICKED
+- PACKED
+- SHIPPED
+- RESERVATION_FAILED
+- CLOSED
+
+Transitions: `reserve_stock`, `pick_shipment`, `pack_shipment`, `ship_shipment`, `close_fulfillment`.
+
+## Actors
+
+`human`, `automation`, and `system` run most transitions; `ai-agent` can participate in close logic based on policy.
+
+## Example
+
+```ts
+await loop.transition('reserve_stock', { actor: 'system:wms' })
+await loop.transition('ship_shipment', { actor: 'automation:3pl' })
+```
+
+## ERP/WMS adapter integration
+
+Adapters map reservation and shipment events (`scm.inventory.stock_reserved.v1`, `scm.execution.shipment_shipped.v1`) to your operational systems.
+
+## Industry extensions
+
+Retail and Food & Beverage packs add SLA and freshness controls on shipment transitions.
