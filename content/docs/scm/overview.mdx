@@ -21,3 +21,23 @@ Each loop is a typed `LoopDefinition` with explicit states, transitions, and act
 | fulfillment | OPEN → RESERVED → PICKED → PACKED → SHIPPED → CLOSED |
 | inventory | OPEN → ADJUSTED → RECONCILED → CLOSED |
 | quality | OPEN → HOLD → ASSESSMENT → RESOLVED → CLOSED |
+
+## Module interface and services
+
+Each `@betterdata/scm-*` package exports **services**, **state machines**, and helpers. Configure runtime dependencies **once** at startup (database accessor, `OutboxWriter`, and where required `ChannelReader`) — there is no global `db()` inside the packages.
+
+```ts
+import { configureInventoryRuntime, getAvailability } from "@betterdata/scm-inventory";
+```
+
+→ [Runtime configuration](/docs/getting-started/runtime-configuration)
+
+## Loop participation
+
+Each SCM package exports a **loop participant** manifest (for example `inventoryLoopParticipant`) built with `LoopIds` and `EventNames` from `@betterdata/loop-definitions`.
+
+```ts
+import { inventoryLoopParticipant } from "@betterdata/scm-inventory";
+```
+
+→ [Loop participation](/docs/getting-started/loop-participation)

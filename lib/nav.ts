@@ -4,6 +4,8 @@ export const docsNav = [
     items: [
       { title: "Quick Start", slug: "getting-started/quick-start" },
       { title: "Architecture", slug: "getting-started/architecture" },
+      { title: "Loop Participation", slug: "getting-started/loop-participation" },
+      { title: "Runtime Configuration", slug: "getting-started/runtime-configuration" },
       { title: "Five Pillars", slug: "getting-started/five-pillars" },
     ],
   },

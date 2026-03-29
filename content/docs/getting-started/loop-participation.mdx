@@ -1,0 +1,118 @@
+---
+title: "Loop Participation"
+description: "How Commerce Chain modules declare participation in Loop Engine loops — LoopParticipantManifest, LoopIds, and EventNames."
+section: "Getting Started"
+---
+
+## What is loop participation?
+
+Every Commerce Chain module declares which loops it participates in and which **domain events** it handles. That declaration is a **`LoopParticipantManifest`** — a plain object you build with constants from `@betterdata/loop-definitions`.
+
+The host runtime (Loop Engine, or your worker) reads these manifests at startup and routes events to the right module handlers.
+
+## The `LoopParticipantManifest` type
+
+```ts
+import type { LoopParticipantManifest, LoopParticipantHandler } from "@betterdata/loop-definitions";
+
+// Conceptually:
+interface LoopParticipantManifest {
+  moduleId: string;
+  description?: string;
+  handles: LoopParticipantHandler[];
+}
+
+interface LoopParticipantHandler {
+  event: import("@betterdata/loop-definitions").EventName | string;
+  loops: readonly import("@betterdata/loop-definitions").LoopId[];
+  description?: string;
+}
+```
+
+Use `EventName` and `LoopId` types for stronger typing; allow `string` only while migrating legacy event names.
+
+## Canonical loop IDs (`LoopIds`)
+
+```ts
+import { LoopIds } from "@betterdata/loop-definitions";
+
+// Supply chain
+LoopIds.SCM_PROCUREMENT; // 'scm.procurement'
+LoopIds.SCM_FULFILLMENT; // 'scm.fulfillment'
+LoopIds.SCM_QUALITY; // 'scm.quality'
+LoopIds.SCM_REPLENISHMENT; // 'scm.replenishment'
+LoopIds.SCM_INVENTORY; // 'scm.inventory'
+LoopIds.SCM_EXECUTION; // 'scm.execution'
+
+// Demand chain
+LoopIds.DCM_DEMAND_SIGNAL; // 'dcm.demand-signal'
+LoopIds.DCM_DEMAND; // 'dcm.demand'
+LoopIds.DCM_ORDER; // 'dcm.order'
+LoopIds.DCM_RETURNS; // 'dcm.returns'
+LoopIds.DCM_CHANNELS; // 'dcm.channels'
+```
+
+The authoritative list is in the package source: `loop-ids.ts`.
+
+## Canonical event names (`EventNames`)
+
+```ts
+import { EventNames } from "@betterdata/loop-definitions";
+
+EventNames.EXECUTION_GOODS_RECEIVED; // 'scm.execution.goods_received.v1'
+EventNames.INVENTORY_STOCK_RESERVED; // 'scm.inventory.stock_reserved.v1'
+EventNames.PROCUREMENT_PO_CONFIRMED; // 'scm.procurement.po_confirmed.v1'
+EventNames.ORDERS_ORDER_CONFIRMED; // 'dcm.orders.order_confirmed.v1'
+// …see event-names.ts for the full set
+```
+
+These strings align with Commerce Chain loop definitions and outbox event types.
+
+## Writing a participant manifest
+
+```ts
+import { LoopIds, EventNames } from "@betterdata/loop-definitions";
+import type { LoopParticipantManifest } from "@betterdata/loop-definitions";
+
+export const myModuleParticipant: LoopParticipantManifest = {
+  moduleId: "scm.my-module",
+  description: "Example custom module",
+  handles: [
+    {
+      event: EventNames.EXECUTION_GOODS_RECEIVED,
+      loops: [LoopIds.SCM_PROCUREMENT],
+      description: "Advance internal state when goods are received"
+    }
+  ]
+};
+```
+
+## Manifest vs inbox split
+
+Some packages separate concerns in source:
+
+| File | Purpose |
+| --- | --- |
+| `loop-manifest.ts` | Pure metadata — safe to import anywhere |
+| `loop-inbox.ts` | Batch / cursor processing for workers (`process*LoopBatch`) |
+| `loop-participation.ts` | Re-exports both for backward compatibility |
+
+**Today**, import participants and batch helpers from the **package root** (for example `@betterdata/scm-procurement`). Dedicated `package.json` subpaths for `loop-manifest` alone may ship in a future release for smaller bundles.
+
+```ts
+import { procurementLoopParticipant, processProcurementLoopBatch } from "@betterdata/scm-procurement";
+```
+
+## Participant validation
+
+`@betterdata/loop-actors` includes tests that assert every published participant only references known `LoopIds` and `EventNames` values.
+
+```bash
+pnpm test --filter @betterdata/loop-actors
+```
+
+## Related
+
+- [Architecture](/docs/getting-started/architecture)
+- [Runtime configuration](/docs/getting-started/runtime-configuration)
+- [Loop Engine](https://loopengine.io/docs) — runtime and adapters

@@ -1,0 +1,111 @@
+---
+title: "Runtime Configuration"
+description: "Adapter injection for Commerce Chain modules — database, outbox, and channel reads without global imports."
+section: "Getting Started"
+---
+
+## Adapter injection (no global `db()`)
+
+Commerce Chain npm packages **do not** import your database. You pass infrastructure in at startup:
+
+- A **database client** (or accessor) your services use
+- An **`OutboxWriter`** so modules can emit domain events
+- Often a **`ChannelReader`** so inbox workers can read channel messages
+
+That keeps packages standalone and testable.
+
+## `OutboxWriter`
+
+Defined in `@betterdata/scm-contracts`:
+
+```ts
+import type { OutboxWriter, OutboxWriteInput } from "@betterdata/scm-contracts";
+
+const outbox: OutboxWriter = {
+  async write(tx: unknown, event: OutboxWriteInput) {
+    // Persist to your outbox table, queue, or log in tests
+  }
+};
+```
+
+`OutboxWriteInput` includes `aggregateType`, `aggregateId`, `eventType`, `payload`, `organizationId`, `correlationId`, and `causationId`.
+
+## `createModuleRuntimeStore`
+
+Modules use this helper (exported from `@betterdata/scm-contracts`) to implement paired `configure*` / `get*` functions:
+
+```ts
+import { createModuleRuntimeStore } from "@betterdata/scm-contracts";
+import type { OutboxWriter, ChannelReader } from "@betterdata/scm-contracts";
+
+interface InventoryRuntimeConfig {
+  getDb: () => unknown;
+  outbox: OutboxWriter;
+  readChannelMessages: ChannelReader;
+}
+
+const store = createModuleRuntimeStore<InventoryRuntimeConfig>(
+  "@betterdata/scm-inventory",
+  "configureInventoryRuntime({ getDb, outbox, readChannelMessages })"
+);
+
+export function configureInventoryRuntime(config: InventoryRuntimeConfig): void {
+  store.configure(config);
+}
+
+export function getInventoryRuntime(): InventoryRuntimeConfig {
+  return store.get();
+}
+```
+
+Shipped modules already wrap this pattern; you call their public `configure*` once at app bootstrap.
+
+## Configuring inventory (full example)
+
+```ts
+import {
+  configureInventoryRuntime,
+  getAvailability
+} from "@betterdata/scm-inventory";
+import type { ChannelReader, OutboxWriter } from "@betterdata/scm-contracts";
+
+const outbox: OutboxWriter = {
+  async write(_tx, event) {
+    console.log("outbox", event.eventType);
+  }
+};
+
+const readChannelMessages: ChannelReader = async () => [];
+
+configureInventoryRuntime({
+  getDb: () => prisma,
+  outbox,
+  readChannelMessages
+});
+
+const lines = await getAvailability({
+  organizationId: "org_1",
+  productMasterId: "pm_1"
+});
+```
+
+## Testing without a real database
+
+Use mocks that satisfy the shapes your service calls:
+
+```ts
+const mockOutbox: OutboxWriter = { write: async () => {} };
+const readChannelMessages: ChannelReader = async () => [];
+
+configureInventoryRuntime({
+  getDb: () => mockPrisma,
+  outbox: mockOutbox,
+  readChannelMessages
+});
+```
+
+## Related
+
+- [Loop participation](/docs/getting-started/loop-participation)
+- [@betterdata/scm-contracts on npm](https://www.npmjs.com/package/@betterdata/scm-contracts)
+- [Architecture](/docs/getting-started/architecture)

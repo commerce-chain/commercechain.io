@@ -30,4 +30,21 @@ Commerce Chain loop policies map to Loop Engine guard semantics:
 - `human-only`
 - `evidence-required`
 
+## Loop definitions and participant manifests
+
+Commerce Chain modules align on identifiers from **`@betterdata/loop-definitions`**:
+
+```ts
+import { LoopIds, EventNames } from "@betterdata/loop-definitions";
+import type { LoopParticipantManifest } from "@betterdata/loop-definitions";
+```
+
+`LoopIds.*` and `EventNames.*` prevent silent string drift between packages. Participant manifests are validated in **`@betterdata/loop-actors`** test suites.
+
+```bash
+npm install @betterdata/loop-definitions
+```
+
+→ [Loop participation](/docs/getting-started/loop-participation)
+
 <EcosystemLink href="https://loopengine.io">loopengine.io</EcosystemLink>

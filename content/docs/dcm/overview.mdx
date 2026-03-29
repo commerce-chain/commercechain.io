@@ -11,3 +11,15 @@ DCM loops in Commerce Chain:
 - `dcm.returns`
 
 They coordinate demand insight, order execution, and reverse-logistics feedback into shared operational state.
+
+## Module interface and services
+
+`@betterdata/dcm-*` packages export state machines and services you use **after** wiring runtime dependencies where the package provides `configure*` (for example `@betterdata/dcm-orders`, `@betterdata/dcm-returns`). Pass your `OutboxWriter` and `ChannelReader` from `@betterdata/scm-contracts`; there is no global database import inside the libraries.
+
+→ [Runtime configuration](/docs/getting-started/runtime-configuration)
+
+## Loop participation
+
+Each DCM package ships a participant manifest (`demandLoopParticipant`, `orderLoopParticipant`, `returnsLoopParticipant`, …) using canonical `LoopIds` and `EventNames` from `@betterdata/loop-definitions`.
+
+→ [Loop participation](/docs/getting-started/loop-participation)
