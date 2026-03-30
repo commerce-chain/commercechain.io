@@ -1,0 +1,148 @@
+---
+title: "AI Replenishment"
+description: "Production-oriented AI-assisted replenishment using Commerce Chain SCM/DCM modules, Loop Engine governance, and Commerce Gateway context."
+section: "Examples"
+complexity: "Advanced"
+---
+
+## Overview
+
+A demand signal is detected. An AI actor analyzes inventory and supplier context (often via **Commerce Gateway**). A confidence-threshold guard evaluates the recommendation. A supply chain manager approves. A purchase order is created and the loop closes with a learning signal.
+
+This page is the **Commerce Chain** counterpart to the [Loop Engine AI Replenishment (Claude) example](https://loopengine.io/docs/examples/ai-replenishment-claude): it centers on **`@betterdata/scm-*`**, **`@betterdata/dcm-*`**, and **`@betterdata/loop-definitions`** instead of using the Loop Engine SDK alone.
+
+## Packages
+
+Typical install surface (adjust versions to match your release):
+
+```bash
+npm install @betterdata/scm-inventory \
+            @betterdata/scm-procurement \
+            @betterdata/dcm-demand \
+            @betterdata/loop-definitions \
+            @loop-engine/sdk \
+            @loop-engine/adapter-anthropic
+```
+
+Optional: `@loop-engine/adapter-commerce-gateway` for structured product and supplier evidence.
+
+## Loop diagram
+
+```text
+IDLE ----[signal_detected]----> SENSING
+SENSING --> ANALYZING
+ANALYZING --[submit_recommendation]--> PENDING_APPROVAL
+ANALYZING --[insufficient_confidence]--> IDLE
+PENDING_APPROVAL --[approve]--> ORDERED (terminal)
+PENDING_APPROVAL --[reject]--> IDLE
+```
+
+Exact transition IDs and states should match your `LoopDefinition` in Loop Engine; the diagram shows the governance shape.
+
+## Module participation
+
+Commerce Chain modules declare how they join loops using **`LoopParticipantManifest`** objects (constants from **`LoopIds`** and **`EventNames`**):
+
+```ts
+import { inventoryLoopParticipant } from "@betterdata/scm-inventory";
+import { procurementLoopParticipant } from "@betterdata/scm-procurement";
+import { demandLoopParticipant } from "@betterdata/dcm-demand";
+import { LoopIds, EventNames } from "@betterdata/loop-definitions";
+
+void inventoryLoopParticipant;
+void procurementLoopParticipant;
+void demandLoopParticipant;
+void LoopIds.SCM_PROCUREMENT;
+void EventNames.EXECUTION_GOODS_RECEIVED;
+```
+
+→ [Loop participation](/docs/getting-started/loop-participation)
+
+## Runtime configuration
+
+Wire infrastructure **once** at process startup. There is no global `db()` inside the OSS packages.
+
+**Inventory** expects a DB accessor, outbox writer, and channel reader:
+
+```ts
+import { configureInventoryRuntime } from "@betterdata/scm-inventory";
+import type { ChannelReader, OutboxWriter } from "@betterdata/scm-contracts";
+
+configureInventoryRuntime({
+  getDb: () => prisma,
+  outbox: myOutbox as OutboxWriter,
+  readChannelMessages: myReader as ChannelReader
+});
+```
+
+**Procurement** uses outbox + channel reader only (no `getDb` on the runtime config today):
+
+```ts
+import { configureProcurementRuntime } from "@betterdata/scm-procurement";
+
+configureProcurementRuntime({
+  outbox: myOutbox as OutboxWriter,
+  readChannelMessages: myReader as ChannelReader
+});
+```
+
+→ [Runtime configuration](/docs/getting-started/runtime-configuration)
+
+## AI actor (Claude) with Gateway context
+
+Use **`@loop-engine/adapter-anthropic`**. The adapter takes an API key (or a pre-built `Anthropic` client) and returns `createSubmission({ signal, actorId, prompt, dataPoints?, ... })` — put Commerce Gateway JSON and inventory summaries **in the prompt** and/or **`dataPoints`** so they flow into governance evidence.
+
+```ts
+import { createAnthropicActorAdapter } from "@loop-engine/adapter-anthropic";
+import type { ActorId, SignalId } from "@loop-engine/core";
+
+const adapter = createAnthropicActorAdapter({
+  apiKey: process.env.ANTHROPIC_API_KEY!,
+  model: "claude-3-5-sonnet-latest"
+});
+
+const gatewayProductContext = { /* from Commerce Gateway */ };
+const inventorySummary = { /* from your read model */ };
+
+const submission = await adapter.createSubmission({
+  signal: "submit_recommendation" as SignalId,
+  actorId: "agent:claude-replenishment" as ActorId,
+  prompt: [
+    "Recommend reorder quantity and primary supplier with rationale.",
+    "Context (JSON):",
+    JSON.stringify({ gatewayProductContext, inventorySummary })
+  ].join("\n"),
+  dataPoints: { loopId: "scm.procurement" }
+});
+
+void submission.actor;
+void submission.evidence;
+```
+
+Pass `submission` into your engine’s transition API the same way as in the [Loop Engine Claude example](https://loopengine.io/docs/examples/ai-replenishment-claude).
+
+## Transition sequence (conceptual)
+
+1. Demand or threshold signal enters the loop (`SENSE` / automation).
+2. AI submission proposes `submit_recommendation` with evidence (`DECIDE`).
+3. Guards enforce confidence and policy (`GOVERN`).
+4. Human `approve` or `reject` on `PENDING_APPROVAL` (`EXECUTE`).
+5. Downstream modules emit domain events; loop completion feeds learning metrics (`IMPROVE`).
+
+## Learning signal
+
+On terminal success, emit or record loop-engine / domain events your observability stack consumes (for example transition records with attached evidence and outcome metadata). Exact payloads depend on your Loop Engine adapter and outbox schema.
+
+## Full source
+
+Reference implementation and runnable sample code will live in the mirror repository:
+
+[github.com/commerce-chain/scm-dcm — examples/ai-replenishment](https://github.com/commerce-chain/scm-dcm/tree/main/examples/ai-replenishment)
+
+(Stub README may be present until the full example lands.)
+
+## Related
+
+- [Loop Engine integration](/docs/integrations/loop-engine)
+- [Commerce Gateway](/docs/integrations/commerce-gateway)
+- [SCM overview](/docs/scm/overview)

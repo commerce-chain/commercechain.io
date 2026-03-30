@@ -4,10 +4,13 @@ description: "Commerce Chain architecture — Five Pillars, OSS/hosted boundary,
 section: "Getting Started"
 ---
 
+Commerce Chain connects supply chain and demand chain loops through Loop Engine, shared contracts, and optional hosted services.
+
+> **New to loop participation?** After this overview, read the [Loop Participation guide](/docs/getting-started/loop-participation) to see how modules declare which loops and events they handle, and the [Runtime configuration guide](/docs/getting-started/runtime-configuration) for the adapter injection pattern (no global database import inside packages).
+
 ## The CCO model
 
-Commerce Chain treats supply chain and demand chain as one operational system.
-SCM and DCM loops share state through Loop Engine events instead of separate orchestration stacks.
+SCM and DCM are modeled as one operational system: loops share state through Loop Engine events instead of separate orchestration stacks.
 
 ## OSS surface vs hosted platform
 
@@ -40,3 +43,11 @@ Apache-2.0 is used for explicit patent grant support and enterprise legal adopti
 
 - Self-hosted: run Loop Engine + Commerce Chain contracts in your infra.
 - Hosted: Better Data operates multi-tenant CCO with managed integrations.
+
+## Related
+
+- [Loop participation](/docs/getting-started/loop-participation)
+- [Runtime configuration](/docs/getting-started/runtime-configuration)
+- [Five pillars](/docs/getting-started/five-pillars)
+- [SCM overview](/docs/scm/overview)
+- [DCM overview](/docs/dcm/overview)

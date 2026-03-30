@@ -29,6 +29,10 @@ export const docsNav = [
     ],
   },
   {
+    section: "Examples",
+    items: [{ title: "AI Replenishment", slug: "examples/ai-replenishment" }],
+  },
+  {
     section: "Industry Packs",
     items: [
       { title: "Overview", slug: "industry-packs/overview" },
@@ -54,5 +58,9 @@ export const docsNav = [
       { title: "Overview", slug: "hosted/overview" },
       { title: "Plans", slug: "hosted/plans" },
     ],
+  },
+  {
+    section: "Governance",
+    items: [{ title: "License", slug: "governance/license" }],
   },
 ] as const;
