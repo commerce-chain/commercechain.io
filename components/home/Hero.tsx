@@ -6,8 +6,10 @@ export function Hero() {
       <div className="content-grid">
         <h1>Supply chain and demand chain. Governed by design.</h1>
         <p className="section-subtitle max-600">
-          Commerce Chain is an open framework for supply and demand operations - typed domain models, canonical loop
-          definitions, and pluggable adapters for any ERP, WMS, or commerce platform.
+          In Better Data, Inventory &amp; Operations is where you run the business; Commerce Chain packages the open models
+          and loops behind that work. Typed domain models, canonical loop definitions, and adapters for ERP, WMS, and
+          commerce platforms — composed with Gateway, Registry, Loop Engine, and Signal Tags as layers, not interchangeable
+          SKUs.
         </p>
         <div className="hero-cta">
           <Link href="/docs/getting-started/architecture" className="btn btn-primary">
