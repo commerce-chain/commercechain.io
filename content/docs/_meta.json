@@ -1,0 +1,12 @@
+{
+  "order": [
+    "getting-started",
+    "scm",
+    "dcm",
+    "examples",
+    "industry-packs",
+    "integrations",
+    "hosted",
+    "governance"
+  ]
+}

@@ -2,39 +2,82 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import { notFound } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
-import { getAllDocSlugs, getDoc } from "@/lib/docs";
-import { MDXComponents } from "@/components/docs/MDXComponents";
+import { DocsPageView } from "@/components/docs/DocsPageView";
+import { DocsPrevNext } from "@/components/docs/DocsPrevNext";
+import { DocsShell } from "@/components/docs/DocsShell";
+import { mdxComponents } from "@/components/docs/MDXComponents";
+import { getAllDocSlugs, getDocBySlug, getPrevNext } from "@/lib/docs";
+
+const SITE = "https://commercechain.io";
 
 export async function generateStaticParams() {
-  return getAllDocSlugs().map((slug) => ({ slug: slug.split("/") }));
+  const slugs = await getAllDocSlugs();
+  return slugs.map((s) => ({ slug: s.split("/").filter(Boolean) }));
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string[] }> }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string[] }>;
+}): Promise<Metadata> {
   const { slug } = await params;
-  const doc = await getDoc(slug);
-  if (!doc) return { title: "Not found" };
-  return { title: doc.title, description: doc.description };
+  let doc;
+  try {
+    doc = await getDocBySlug(slug);
+  } catch {
+    return { title: "Not found" };
+  }
+  const canonical = doc.frontmatter.canonical ?? `${SITE}/docs/${doc.slugPath}`;
+  return {
+    title: doc.title,
+    description: doc.description,
+    alternates: { canonical },
+    openGraph: {
+      title: doc.title,
+      description: doc.description,
+      url: `${SITE}/docs/${doc.slugPath}`,
+    },
+  };
 }
 
 export default async function DocPage({ params }: { params: Promise<{ slug: string[] }> }) {
   const { slug } = await params;
-  const doc = await getDoc(slug);
-  if (!doc) notFound();
+  let doc;
+  try {
+    doc = await getDocBySlug(slug);
+  } catch {
+    notFound();
+  }
+
+  const { prev, next } = await getPrevNext(slug);
 
   const articleJsonLd = {
     "@context": "https://schema.org",
     "@type": "TechArticle",
     headline: doc.title,
     description: doc.description,
-    url: `https://commercechain.io/docs/${doc.slug}`,
+    url: `https://commercechain.io/docs/${doc.slugPath}`,
   };
 
   return (
     <>
-      <Script id={`doc-jsonld-${doc.slug}`} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
-      <h1>{doc.title}</h1>
-      <p className="lead">{doc.description}</p>
-      <MDXRemote source={doc.content} components={MDXComponents} />
+      <Script
+        id={`doc-jsonld-${doc.slugPath}`}
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
+      <DocsShell
+        sectionLabel={doc.sectionLabel}
+        title={doc.title}
+        description={doc.description}
+        readingTimeText={doc.readingTimeText}
+        headings={doc.headings}
+        filePath={doc.filePath}
+      >
+        <DocsPageView slugPath={doc.slugPath} title={doc.title} />
+        <MDXRemote source={doc.source} components={mdxComponents} />
+        <DocsPrevNext prev={prev} next={next} />
+      </DocsShell>
     </>
   );
 }

@@ -1,0 +1,11 @@
+{
+  "order": [
+    "overview",
+    "healthcare",
+    "pharma",
+    "retail",
+    "manufacturing",
+    "food-beverage",
+    "construction"
+  ]
+}

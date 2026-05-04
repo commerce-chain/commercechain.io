@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
+import type { ComponentProps } from "react";
 import type { MDXComponents as MDXComponentMap } from "mdx/types";
+import { headingId } from "@/lib/docs";
 import { CodeBlock } from "@/components/docs/CodeBlock";
 
 type BadgeProps = { children: ReactNode };
@@ -12,4 +14,16 @@ export function ProprietaryNote({ children }: BadgeProps) { return <div classNam
 export function LoopDiagram({ children }: BadgeProps) { return <pre className="code-block">{children}</pre>; }
 export function EcosystemLink({ href, children }: { href: string; children: ReactNode }) { return <a href={href} className="text-link">{children}</a>; }
 
-export const MDXComponents: MDXComponentMap = { pre: (props) => <CodeBlock {...props} />, PillarBadge, IndustryPackBadge, OSSSurface, ProprietaryNote, LoopDiagram, EcosystemLink };
+export const MDXComponents: MDXComponentMap = {
+  h2: ({ children }: ComponentProps<"h2">) => <h2 id={headingId(String(children ?? ""))}>{children}</h2>,
+  h3: ({ children }: ComponentProps<"h3">) => <h3 id={headingId(String(children ?? ""))}>{children}</h3>,
+  pre: (props) => <CodeBlock {...props} />,
+  PillarBadge,
+  IndustryPackBadge,
+  OSSSurface,
+  ProprietaryNote,
+  LoopDiagram,
+  EcosystemLink,
+};
+
+export const mdxComponents = MDXComponents;

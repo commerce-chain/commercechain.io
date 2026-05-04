@@ -1,0 +1,3 @@
+{
+  "order": ["loop-engine", "commerce-gateway", "signal-tags"]
+}
