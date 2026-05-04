@@ -7,7 +7,6 @@ export const metadata: Metadata = {
   title: "Partners — Commerce Chain",
   description:
     "Commerce Chain ecosystem partners — Loop Engine, Commerce Gateway, Signal Tags, and the Commerce Chain partner program.",
-  robots: { index: false, follow: false },
 };
 
 const accentColors: Record<string, string> = {

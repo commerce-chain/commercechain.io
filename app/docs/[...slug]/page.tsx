@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const doc = await getDoc(slug);
   if (!doc) return { title: "Not found" };
-  return { title: doc.title, description: doc.description, robots: { index: false, follow: false } };
+  return { title: doc.title, description: doc.description };
 }
 
 export default async function DocPage({ params }: { params: Promise<{ slug: string[] }> }) {
