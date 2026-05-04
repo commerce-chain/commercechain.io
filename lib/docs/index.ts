@@ -10,3 +10,4 @@ export {
   type NavPrevNext,
 } from "./loader";
 export { getNavTree } from "./nav";
+export { SECTION_LABEL_ORDER } from "./reader-order";

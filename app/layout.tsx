@@ -16,6 +16,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://commercechain.io"),
   title: { default: "Commerce Chain", template: "%s | Commerce Chain" },
   description: "Open framework for governed supply and demand chain operations.",
+  robots: { index: true, follow: true },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
