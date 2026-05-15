@@ -18,6 +18,7 @@ export default function HomePage() {
     name: "Commerce Chain",
     applicationCategory: "DeveloperApplication",
     url: "https://commercechain.io",
+    author: { "@type": "Organization", name: "Better Data", url: "https://betterdata.co" },
     offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
   };
 

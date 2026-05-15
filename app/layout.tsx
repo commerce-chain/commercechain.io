@@ -18,6 +18,19 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://commercechain.io"),
   title: { default: "Commerce Chain", template: "%s | Commerce Chain" },
   description: "Open framework for governed supply and demand chain operations.",
+  authors: [{ name: "Better Data", url: "https://betterdata.co" }],
+  creator: "Better Data",
+  publisher: "Better Data",
+  openGraph: {
+    type: "website",
+    siteName: "Commerce Chain",
+    url: "https://commercechain.io",
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: "@betterdatainc",
+    creator: "@betterdatainc",
+  },
   robots: { index: true, follow: true },
 };
 
